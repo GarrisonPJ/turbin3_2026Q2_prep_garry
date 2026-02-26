@@ -1,0 +1,28 @@
+# Wallets / Keys
+*wallet.json
+*.key
+*keypair.json
+
+# Rust
+**/target/
+**/*.rs.bk
+debug/
+release/
+
+# Node
+**/node_modules/
+**/.yarn/
+
+# Anchor
+**/.anchor/
+**/test-ledger/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
