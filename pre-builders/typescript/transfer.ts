@@ -1,63 +1,80 @@
-import { Transaction, SystemProgram, Connection, Keypair,
-    LAMPORTS_PER_SOL, sendAndConfirmTransaction, PublicKey } from
-    "@solana/web3.js"
+import {
+  SystemProgram,
+  Connection,
+  Keypair,
+  ComputeBudgetProgram,
+  PublicKey,
+  TransactionMessage,
+  VersionedTransaction
+} from "@solana/web3.js";
 
 import wallet from "./dev-wallet.json";
 
 // Import our dev wallet keypair from the wallet file
 const from = Keypair.fromSecretKey(new Uint8Array(wallet));
 
-const to = new PublicKey("4xn8H7RSXM64qSkjWMhjaKbEPS64pw7VGVgcXNc79jZr"); // my wallet
+const to = new PublicKey("HaZRyLZzRknszTHqHn4Kj1iu9uGr6Wiss3jPRDiVPQqz"); // another wallet of mine
 
-// Create a connection to the devnet cluster
-const connection = new Connection("https://api.devnet.solana.com", "confirmed");
-
-
+// Create a connection to the devnet cluster (using Ankr to avoid fetch failed/rate limits)
+const connection = new Connection("https://rpc.ankr.com/solana_devnet", "confirmed");
 
 (async () => {
-    try {
-        // Get balance of dev wallet
-        const balance = await connection.getBalance(from.publicKey)
+  try {
+    // Get balance of dev wallet
+    const balance = await connection.getBalance(from.publicKey);
+    if (balance === 0) throw new Error("Balance is 0. Please get SOL from faucet.solana.com first!");
 
-        // Create a test transaction to calculate fees
-        const transaction = new Transaction().add(
-            SystemProgram.transfer({
-                fromPubkey: from.publicKey,
-                toPubkey: to,
-                lamports: balance,
-            }
-        )
-        );
-        transaction.recentBlockhash = (await connection.getLatestBlockhash('confirmed')).blockhash;
-        
-        transaction.feePayer = from.publicKey;
-        // Calculate exact fee rate to transfer entire SOL amount out of account minus fees
-        const fee = (await connection.getFeeForMessage(
-            transaction.compileMessage(),
-            'confirmed')).value || 0;
+    // Rewrote in Agave 3.0 Practice: Add Priority Fees (Compute Budget) to ensure the transaction lands
+    const instructions = [
+      ComputeBudgetProgram.setComputeUnitLimit({ units: 1000 }),
+      ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100_000 }),
+      SystemProgram.transfer({
+        fromPubkey: from.publicKey,
+        toPubkey: to,
+        lamports: balance, // Dummy amount to calculate the exact message size
+      })
+    ];
 
-        // Remove our transfer instruction to replace it
-        transaction.instructions.pop();
+    const blockstat = await connection.getLatestBlockhash('confirmed');
 
-        // Now add the instruction back with correct amount of lamports
-        transaction.add(
-            SystemProgram.transfer({
-                fromPubkey: from.publicKey,
-                toPubkey: to,
-                lamports: balance - fee,
-            }
-        )
-        );
-        
-        // Sign transaction, broadcast, and confirm
-        const signature = await sendAndConfirmTransaction(
-            connection,
-            transaction,
-            [from]
-        );
-        console.log(`Success! Check out your TX here:
-        https://explorer.solana.com/tx/${signature}?cluster=devnet`)
-    } catch(e) {
-    console.error(`Oops, something went wrong: ${e}`)
-    }
-    })();
+    // Compile instructions into a V0 Message to accurately estimate the network fee
+    const messageV0 = new TransactionMessage({
+      payerKey: from.publicKey,
+      recentBlockhash: blockstat.blockhash,
+      instructions: instructions,
+    }).compileToV0Message();
+
+    // Calculate exact fee rate to transfer entire SOL amount out of account minus fees
+    const fee = (await connection.getFeeForMessage(messageV0, 'confirmed')).value || 0;
+
+    // Immutable approach: Overwrite the dummy instruction with the exact lamports (balance - fee)
+    instructions[2] = SystemProgram.transfer({
+      fromPubkey: from.publicKey,
+      toPubkey: to,
+      lamports: balance - fee,
+    });
+
+    const finalMessageV0 = new TransactionMessage({
+      payerKey: from.publicKey,
+      recentBlockhash: blockstat.blockhash,
+      instructions: instructions,
+    }).compileToV0Message();
+
+    // Create VersionedTransaction (V0), sign, send and watch for confirmation
+    const transaction = new VersionedTransaction(finalMessageV0);
+    transaction.sign([from]);
+
+    const txid = await connection.sendTransaction(transaction);
+
+    await connection.confirmTransaction({
+      blockhash: blockstat.blockhash,
+      lastValidBlockHeight: blockstat.lastValidBlockHeight,
+      signature: txid,
+    }, 'confirmed');
+
+    console.log('Success! Check out your TX here:');
+    console.log(`https://explorer.solana.com/tx/${txid}?cluster=devnet`);
+  } catch (e) {
+    console.error(`Oops, something went wrong: ${e}`);
+  }
+})();
