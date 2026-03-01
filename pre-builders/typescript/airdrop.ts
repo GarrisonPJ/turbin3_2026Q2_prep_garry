@@ -5,22 +5,29 @@ import {
   TransactionConfirmationStrategy,
 } from "@solana/web3.js";
 import wallet from "./dev-wallet.json";
+import "dotenv/config";
 
 // create a connection to the devnet cluster
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
 
 // try multiple RPCs. if RPC returns "Internal error", switch to the next.
 const RPC_URLS = [
-  "https://api.devnet.solana.com",
-  "https://rpc.ankr.com/solana_devnet",
-  "https://solana-devnet.publicnode.com",
-];
+  process.env.SOLANA_RPC_URL,
+  process.env.SOLANA_RPC_FALLBACK_1,
+  process.env.SOLANA_RPC_FALLBACK_2,
+  process.env.SOLANA_RPC_FALLBACK_3,
+].filter((v): v is string => !!v);
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 (async () => {
+  if (RPC_URLS.length === 0) {
+    console.error("No RPC URLs found. Please configure .env");
+    return;
+  }
+
   for (let i = 0; i < RPC_URLS.length; i++) {
     const rpcUrl = RPC_URLS[i];
     const connection = new Connection(rpcUrl, "confirmed");
@@ -45,7 +52,7 @@ function sleep(ms: number) {
         lastValidBlockHeight: latestBlockhash.lastValidBlockHeight, // use the data already returned instead of requesting again
       };
 
-      await connection.confirmTransaction(strategy); // passing strategy here instead, old method deprecated
+      await connection.confirmTransaction(strategy, "confirmed"); // passing strategy here instead, old method deprecated
 
       console.log("Success! Check out your TX here:");
       console.log(`https://explorer.solana.com/tx/${txhash}?cluster=devnet`); // keep the url complete from the possible line wrapping
@@ -56,7 +63,13 @@ function sleep(ms: number) {
       console.error(e);
 
       // only switch RPCs for the "Internal error" case; otherwise stop early.
-      if (msg.includes("Internal error")) {
+      if (
+        msg.includes("Internal error") ||
+        msg.includes("429") ||
+        msg.toLowerCase().includes("fetch failed") ||
+        msg.toLowerCase().includes("timeout") ||
+        msg.toLowerCase().includes("blockhash not found")
+      ) {
         console.error(`Oops, something went wrong: ${msg}`);
         console.error("RPC returned Internal error, switching RPC and retrying...\n");
 

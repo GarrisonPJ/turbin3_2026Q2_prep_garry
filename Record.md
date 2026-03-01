@@ -9,3 +9,6 @@ rewrote pre-builders/typescript/transfer.ts. upgraded to VersionedTransaction (V
 
 2026/3/1
 rewrote pre-builders/typescript/enroll.ts. Removed redundant `.signers([keypair])` as AnchorProvider handles auto-signing. Omitted manual `prereq` (PDA) and `systemProgram` declarations, allowing IDL metadata to resolve them automatically.
+
+2026/3/1
+rewrote pre-builders/typescript/airdrop.ts, pre-builders/typescript/transfer.ts, and pre-builders/typescript/enroll.ts. Switched RPC configuration to project-level `.env` (primary + fallback endpoints) and added related safety validations (empty config guard, retryable error handling, and post-success early return to avoid duplicate submissions) with AI assisting and code-reviewing.
