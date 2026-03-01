@@ -6,3 +6,6 @@ rewrote pre-builders/typescript/airdrop.ts. Reduced redundant RPC calls by using
 
 2026/2/28
 rewrote pre-builders/typescript/transfer.ts. upgraded to VersionedTransaction (V0) and added ComputeBudgetProgram for priority fees. replaced `.pop()` with array replacement for exact fee calculation. fixed RPC fetch failed errors by switching to Ankr node.
+
+2026/3/1
+rewrote pre-builders/typescript/enroll.ts. Removed redundant `.signers([keypair])` as AnchorProvider handles auto-signing. Omitted manual `prereq` (PDA) and `systemProgram` declarations, allowing IDL metadata to resolve them automatically.
