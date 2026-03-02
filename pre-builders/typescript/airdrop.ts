@@ -39,7 +39,7 @@ function sleep(ms: number) {
       // claim 1 devnet SOL tokens to decrease the possibility of rate-limitting
       const txhash = await connection.requestAirdrop(
         keypair.publicKey,
-        LAMPORTS_PER_SOL
+        LAMPORTS_PER_SOL,
       );
 
       // get the latest blockhash
@@ -62,7 +62,7 @@ function sleep(ms: number) {
 
       console.error(e);
 
-      // only switch RPCs for the "Internal error" case; otherwise stop early.
+      // only switch RPCs for retryable cases; otherwise stop early.
       if (
         msg.includes("Internal error") ||
         msg.includes("429") ||
@@ -71,7 +71,9 @@ function sleep(ms: number) {
         msg.toLowerCase().includes("blockhash not found")
       ) {
         console.error(`Oops, something went wrong: ${msg}`);
-        console.error("RPC returned Internal error, switching RPC and retrying...\n");
+        console.error(
+          "RPC returned Internal error, switching RPC and retrying...\n",
+        );
 
         // small delay before switching to next RPC
         await sleep(800);
@@ -83,5 +85,5 @@ function sleep(ms: number) {
     }
   }
 
-  console.error("All RPCs failed with Internal error. Please try again later.");
+  console.error("All RPCs failed. Please try again later.");
 })();

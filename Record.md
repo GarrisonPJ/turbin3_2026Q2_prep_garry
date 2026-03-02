@@ -12,3 +12,8 @@ rewrote pre-builders/typescript/enroll.ts. Removed redundant `.signers([keypair]
 
 2026/3/1
 rewrote pre-builders/typescript/airdrop.ts, pre-builders/typescript/transfer.ts, and pre-builders/typescript/enroll.ts. Switched RPC configuration to project-level `.env` (primary + fallback endpoints) and added related safety validations (empty config guard, retryable error handling, and post-success early return to avoid duplicate submissions) with AI assisting and code-reviewing.
+
+2026/3/2
+refactored pre-builders/typescript/transfer.ts and pre-builders/typescript/enroll.ts to align with the defensive programming standard of airdrop.ts. Fixed a critical control flow bug (infinite balance drain loop) by enforcing strict early `return` upon transaction confirmation. Flattened redundant nested retry loops into a unified, single-layer RPC fallback architecture,
+resolving scope traps with `continue` to properly cycle endpoints
+on transient network errors.
