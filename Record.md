@@ -17,3 +17,6 @@ rewrote pre-builders/typescript/airdrop.ts, pre-builders/typescript/transfer.ts,
 refactored pre-builders/typescript/transfer.ts and pre-builders/typescript/enroll.ts to align with the defensive programming standard of airdrop.ts. Fixed a critical control flow bug (infinite balance drain loop) by enforcing strict early `return` upon transaction confirmation. Flattened redundant nested retry loops into a unified, single-layer RPC fallback architecture,
 resolving scope traps with `continue` to properly cycle endpoints
 on transient network errors.
+
+2026/3/3
+Architected Rust implementation. split the original `lib.rs` into 5 modules. New `lib.rs` for claiming crates, `wallet.rs` for loading wallet, `config.rs` for centralized environment management and `types.rs` for manual Anchor discriminator payload construction. Structured `solana_ops.rs` into a stateful client engine(Partly implemented).
