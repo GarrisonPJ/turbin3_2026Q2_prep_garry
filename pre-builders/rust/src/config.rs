@@ -6,7 +6,7 @@ use std::str::FromStr;
 // Centralize environment configuration loader
 // Avoid hardcoded variable
 pub struct Config {
-    pub(crate) rpc_url: String,
+    pub rpc_url: String,
     pub program_id: Pubkey,
     pub github_handle: String,
 }
@@ -18,7 +18,8 @@ impl Config {
         let rpc_url = env::var("SOLANA_RPC_URL")
             .unwrap_or_else(|_| "https://api.devnet.solana.com".to_string());
 
-        let program_id_str = env::var("PROGRAM_ID").context("Program id is missing in env file")?;
+        let program_id_str =
+            env::var("TURBIN3_PROGRAM_ID").context("Program id is missing in env file")?;
         let program_id = Pubkey::from_str(&program_id_str).context("Invalid program id")?;
 
         let github_handle =

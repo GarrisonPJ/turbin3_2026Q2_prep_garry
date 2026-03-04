@@ -20,3 +20,6 @@ on transient network errors.
 
 2026/3/3
 Architected Rust implementation. split the original `lib.rs` into 5 modules. New `lib.rs` for claiming crates, `wallet.rs` for loading wallet, `config.rs` for centralized environment management and `types.rs` for manual Anchor discriminator payload construction. Structured `solana_ops.rs` into a stateful client engine(Partly implemented).
+
+2026/3/4
+Completed `solana_ops.rs`. Manually derived PDAs, constructed `AccountMeta` permission arrays, and packed CPI instructions into Agave 3.0 `VersionedTransaction` (v0). Resolved Rust borrow checker lifetime traps using explicit variable bindings. Separated execution flow into `tests/integration.rs` using `#[ignore]` flags for secure RPC E2E testing. Solana runtime state locks (`already in use`) caused by previously initialized PDAs, indicating the code is functioning. Deleted auto-generated client bindings (`src/programs/`) in favor of a 100% manual CPI architecture.
