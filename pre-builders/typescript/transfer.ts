@@ -1,6 +1,5 @@
 import {
   SystemProgram,
-  Connection,
   Keypair,
   ComputeBudgetProgram,
   PublicKey,
@@ -9,30 +8,15 @@ import {
 } from "@solana/web3.js";
 import "dotenv/config";
 import wallet from "./dev-wallet.json";
+import { executeWithFallback } from "./utils/rpc";
 
 // Import our dev wallet keypair from the wallet file
 const from = Keypair.fromSecretKey(new Uint8Array(wallet));
-
 const to = new PublicKey("HaZRyLZzRknszTHqHn4Kj1iu9uGr6Wiss3jPRDiVPQqz"); // another wallet of mine
 
-// Create a connection to the devnet cluster (env primary + env fallbacks)
-const RPC_URLS = [
-  process.env.SOLANA_RPC_URL,
-  process.env.SOLANA_RPC_FALLBACK_1,
-  process.env.SOLANA_RPC_FALLBACK_2,
-  process.env.SOLANA_RPC_FALLBACK_3,
-].filter((v): v is string => !!v);
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 (async () => {
-  for (let i = 0; i < RPC_URLS.length; i++) {
-    const rpcUrl = RPC_URLS[i];
-    const connection = new Connection(rpcUrl, "confirmed");
-
-    try {
-      console.log(`Using RPC: ${rpcUrl}`);
+  try {
+    await executeWithFallback(async (connection) => {
       // Get balance of dev wallet
       const balance = await connection.getBalance(from.publicKey);
       if (balance === 0)
@@ -103,34 +87,8 @@ function sleep(ms: number) {
 
       console.log("Success! Check out your TX here:");
       console.log(`https://explorer.solana.com/tx/${txid}?cluster=devnet`);
-      return;
-    } catch (e) {
-      const msg = (e as any)?.message ?? String(e);
-
-      console.error(e);
-
-      // only switch RPCs for retryable cases; otherwise stop early.
-      if (
-        msg.includes("Internal error") ||
-        msg.includes("429") ||
-        msg.toLowerCase().includes("fetch failed") ||
-        msg.toLowerCase().includes("timeout") ||
-        msg.toLowerCase().includes("blockhash not found")
-      ) {
-        console.error(`Oops, something went wrong: ${msg}`);
-        console.error(
-          "RPC returned Internal error, switching RPC and retrying...\n",
-        );
-
-        // small delay before switching to next RPC
-        await sleep(800);
-        continue;
-      }
-
-      console.error(`Oops, something went wrong: ${msg}`);
-      return;
-    }
+    });
+  } catch (e) {
+    console.error("Transfer Failed:", e);
   }
-
-  console.error("All RPCs failed. Please try again later.");
 })();

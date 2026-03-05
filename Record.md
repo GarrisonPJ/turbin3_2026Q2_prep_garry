@@ -23,3 +23,6 @@ Architected Rust implementation. split the original `lib.rs` into 5 modules. New
 
 2026/3/4
 Completed `solana_ops.rs`. Manually derived PDAs, constructed `AccountMeta` permission arrays, and packed CPI instructions into Agave 3.0 `VersionedTransaction` (v0). Resolved Rust borrow checker lifetime traps using explicit variable bindings. Separated execution flow into `tests/integration.rs` using `#[ignore]` flags for secure RPC E2E testing. Solana runtime state locks (`already in use`) caused by previously initialized PDAs, indicating the code is functioning. Deleted auto-generated client bindings (`src/programs/`) in favor of a 100% manual CPI architecture.
+
+2026/3/5
+Extracted nested, imperative RPC retry loops from `airdrop.ts`, `transfer.ts`, and `enroll.ts` into a unified `utils/rpc.ts` utility layer. Implemented a Higher-Order Function (`executeWithFallback`) featuring a "Blacklist" Error Discriminator to enforce Fail-Fast behavior on errors while retrying transient network drops. Refactored all three scripts into declarative, DRY architectures while preserving Agave 3.0 primitives and Anchor 0.30+ automatic PDA resolution.
