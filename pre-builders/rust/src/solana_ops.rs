@@ -49,7 +49,7 @@ impl SolanaOps {
         let args = CompleteArgs {
             github: self.github.as_bytes().to_vec(),
         };
-        let instruction_data = args.get_instruction_data();
+        let instruction_data = args.get_instruction_data()?;
 
         //constrcut AccountMeta
         let accounts = vec![

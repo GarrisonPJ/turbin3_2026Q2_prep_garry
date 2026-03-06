@@ -26,3 +26,6 @@ Completed `solana_ops.rs`. Manually derived PDAs, constructed `AccountMeta` perm
 
 2026/3/5
 Extracted nested, imperative RPC retry loops from `airdrop.ts`, `transfer.ts`, and `enroll.ts` into a unified `utils/rpc.ts` utility layer. Implemented a Higher-Order Function (`executeWithFallback`) featuring a "Blacklist" Error Discriminator to enforce Fail-Fast behavior on errors while retrying transient network drops. Refactored all three scripts into declarative, DRY architectures while preserving Agave 3.0 primitives and Anchor 0.30+ automatic PDA resolution.
+
+2026/3/6
+Implemented deep error downcasting in Rust `tests/integration.rs`, unwrapping `ClientError` chains to gracefully catch `already in use` protocol errors without panicking. Resolved directory fragmentation by enforcing a highly cohesive architecture, unifying `.env` and `dev-wallet.json` at the `pre-builders/` root folder. And some other changes are made. `pre-builders` folder end here so far.

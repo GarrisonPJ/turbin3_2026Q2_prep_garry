@@ -6,8 +6,7 @@ import {
   TransactionMessage,
   VersionedTransaction,
 } from "@solana/web3.js";
-import "dotenv/config";
-import wallet from "./dev-wallet.json";
+import wallet from "../dev-wallet.json";
 import { executeWithFallback } from "./utils/rpc";
 
 // Import our dev wallet keypair from the wallet file

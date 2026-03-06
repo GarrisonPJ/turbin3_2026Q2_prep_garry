@@ -1,6 +1,8 @@
 import { Connection } from "@solana/web3.js";
-import "dotenv/config";
+import * as dotenv from "dotenv";
+import * as path from "path";
 
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 //Get all the RPC nodes configured
 export function getRpcEndPoints(): string[] {
   const endpoints: string[] = [];

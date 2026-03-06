@@ -1,17 +1,16 @@
-import { Keypair } from '@solana/web3.js';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { Keypair } from "@solana/web3.js";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 function loadOrGenWallet() {
-  const WALLET = 'dev-wallet.json';
+  const WALLET = "../dev-wallet.json";
 
   if (existsSync(WALLET)) {
-    const wallet = readFileSync(WALLET, 'utf-8');
+    const wallet = readFileSync(WALLET, "utf-8");
 
-    console.log('you have a wallet already:');
-    console.log('wallet', wallet);
-  }
-  else {
-    console.log('your Keypair is generating');
+    console.log("you have a wallet already:");
+    console.log("wallet", wallet);
+  } else {
+    console.log("your Keypair is generating");
 
     //generate keypair
     let keyPair = Keypair.generate();
@@ -22,8 +21,7 @@ function loadOrGenWallet() {
 
     // save the wallet
     writeFileSync(WALLET, JSON.stringify(Array.from(keyPair.secretKey)));
-    console.log('your wallet is save to', WALLET);
-
+    console.log("your wallet is save to", WALLET);
   }
 }
 

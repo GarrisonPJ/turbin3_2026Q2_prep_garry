@@ -4,8 +4,7 @@ import {
   LAMPORTS_PER_SOL,
   TransactionConfirmationStrategy,
 } from "@solana/web3.js";
-import wallet from "./dev-wallet.json";
-import "dotenv/config";
+import wallet from "../dev-wallet.json";
 import { executeWithFallback } from "./utils/rpc";
 
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));

@@ -1,8 +1,7 @@
 import { Connection, Keypair } from "@solana/web3.js";
 import { Program, Wallet, AnchorProvider } from "@coral-xyz/anchor";
 import { IDL, Turbin3Prereq } from "./programs/Turbin3_prereq";
-import wallet from "./dev-wallet.json";
-import "dotenv/config";
+import wallet from "../dev-wallet.json";
 import { executeWithFallback } from "./utils/rpc";
 
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));

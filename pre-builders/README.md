@@ -1,72 +1,71 @@
-# My Turbin3 Q1 2025 Codebase 🦇
+# Turbin3 2026 Q2 Prerequisite - Garry
 
-This is a comprehensive reference to the code I wrote and edited while learning in the **Solana Turbin3 Q1 Cohort**. It's a personal archive showcasing me chewing glass throughout the program.  
+A implementation of the Turbin3 Pre-Builders assignment. This repository goes beyond the basic requirements, integrating enterprise-grade resilience and Agave 3.0 standards into both TypeScript and Rust environments.
 
----
+## Key Technical Highlights
 
-## 🗂️ Folders  
+- **Resilient RPC Engine (TypeScript)**: Custom `executeWithFallback` wrapper that provides automatic failover across multiple RPC nodes and intelligent retry mechanisms, gracefully filtering out non-retriable on-chain errors.
+- **Deep Error Downcasting (Rust)**: Advanced `match` handling of `solana_client::client_error::ClientError`. It elegantly unwraps the `cause.chain()` to differentiate between fatal protocol errors (like `already in use`) and transient network timeouts.
+- **Agave 3.0 Standard**: Implements `ComputeBudgetProgram` priority fees dynamically in the TS transfer script to ensure transactions land smoothly during network congestion.
+- **High Cohesion Architecture**: Both the Rust and TypeScript environments cleanly share a single `.env` and `dev-wallet.json` configuration at the project root, strictly adhering to DRY principles without sacrificing module independence.
 
-- **`airdrop/`**  
-  Contains TypeScript code written and edited for the pre-requisite task.  
+## 📂 Project Structure
 
-- **`escrow/`**  
-  Contains an Anchor program for an Escrow Smart Contract.  
+```text
+pre-builders/
+├── dev-wallet.json        # Shared Devnet Keypair (Generated)
+├── .env                   # Shared RPC Configuration
+├── rust/                  # Rust Prereq Implementation
+│   ├── src/               # Library logic & Config loading
+│   └── tests/             # Integration tests & Enrollment
+└── typescript/            # TypeScript Prereq Implementation
+    ├── utils/             # Fallback RPC Engine
+    └── *.ts               # Keygen, Airdrop, Transfer, Enroll
+```
 
-- **`rust-prereq/`**  
-  Contains Rust code written and edited for the second pre-requisite task.  
+## 🛠️ Getting Started
 
-- **`solana-starter/`**  
-  Contains SPL-related edits made during the first class.  
+### 1. Configuration
+1. Clone this directory.
+2. Copy `.env.example` to `.env`.
+3. Fill in your preferred Solana Devnet RPC URLs in the `.env` file (the system supports up to 2 fallback nodes).
 
-- **`vault/`**  
-  Contains an Anchor program for a Vault smart contract.  
+### 2. The TypeScript Track
+Navigate to the `typescript` directory and install dependencies:
+```bash
+cd typescript
+npm install
+```
 
-- **`Capstone LOI - Sarugami.docx`**  
-  The Capstone Letter of Intent for the Turbin3 2025 Q1 Builders Cohort.  
+Execute the pipeline sequentially:
+```bash
+# 1. Generate a new keypair (saved to ../dev-wallet.json)
+npx ts-node keygen.ts
 
----
+# 2. Claim Devnet SOL via custom RPC fallback wrapper
+npx ts-node airdrop.ts
 
+# 3. Transfer SOL using Agave 3.0 Priority Fees and precise fee calculation
+npx ts-node transfer.ts
 
-## ⚙️ Setup  
+# 4. Enroll into the Turbin3 PDA (Anchor IDL Interaction)
+npx ts-node enroll.ts
+```
 
-1. **Install Rust Compiler**:  
-   Follow the [Rust installation guide](https://www.rust-lang.org/tools/install).  
+### 3. The Rust Track
+Navigate to the `rust` directory:
+```bash
+cd ../rust
+```
 
-2. **Install Node.js**:  
-   Download and install Node.js from [Node.js official site](https://nodejs.org/).  
+The Rust environment automatically traverses the directory tree to locate the shared `.env` and `dev-wallet.json`.
 
-3. **Install Yarn**:  
-   Use the following command:  
-   ```bash
-   npm install --global yarn
-   ```
+Execute the enrollment integration test:
+```bash
+# The --nocapture flag is required to view the detailed transaction signature
+# or the deeply parsed error downcast logs (e.g., if the PDA is already in use).
+cargo test -- --ignored --nocapture
+```
 
-## 🔨 Built with:
-- 🦀 Rust
-A general-purpose programming language emphasizing performance, type safety, and concurrency.
-
-- TypeScript
-A high-level programming language developed by Microsoft that adds static typing with optional type annotations to JavaScript.
-
--  ⚓ Anchor
-A framework that simplifies the process of building Solana programs with an emphasis on safety and developer experience.
-
-- Grit
-Motivation and determination! 💪
-
-
-
-## 🤝 Contribution
-If this repository serves as a helpful resource for your studies or research, you're welcome to contribute. Here's how:
-
-**Fork the base repository**.
-- Create a new branch for your changes.
-- Submit a pull request with your updates.
-- All contributions are appreciated and will be reviewed promptly.
-
-## 👨🏽‍🔧 Maintainer
-dvrvsimi
-
-🐦 twitter: [sarugami_sol](https://x.com/sarugami_sol)
-
-> Feel free to use this repository as a reference for your Solana development journey. Let's build together! 🚀
+## Security Note
+The `.gitignore` is strictly configured to prevent the accidental commit of `.env` and `dev-wallet.json`.
