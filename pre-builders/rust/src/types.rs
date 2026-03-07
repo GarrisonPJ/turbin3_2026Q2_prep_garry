@@ -22,3 +22,23 @@ impl CompleteArgs {
         Ok(data)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_instruction_data_encoding() {
+        let args = CompleteArgs {
+            github: b"Turbin3".to_vec(),
+        };
+
+        let data = args.get_instruction_data().expect("Should serialize");
+        //Check if first 8bytes is the right Anchor Discriminator
+        assert_eq!(&data[0..8], &CompleteArgs::DISCRIMINATOR);
+        //Check if length is right
+        assert_eq!(data.len(), 19, "Payload size mismatch");
+        //Check if last part is our input string
+        assert_eq!(&data[12..], b"Turbin3");
+    }
+}

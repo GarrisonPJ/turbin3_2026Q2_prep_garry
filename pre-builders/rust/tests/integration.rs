@@ -8,7 +8,7 @@ use solana_client::client_error::{ClientError, ClientErrorKind};
 fn test_enroll() -> Result<()> {
     let config = Config::load()?;
 
-    let ops = SolanaOps::new(&config, "../dev-wallet.json")?;
+    let ops = SolanaOps::new(&config)?;
 
     println!(
         "Submitting enrollment transaction for Github:{}...",
@@ -17,11 +17,13 @@ fn test_enroll() -> Result<()> {
 
     match ops.enroll() {
         Ok(signature) => {
-            println!("Succcss! Transaction Signature:");
+            println!("Success! Transaction Signature:");
             println!(
                 "https://explorer.solana.com/tx/{}?cluster=devnet",
                 signature
             );
+
+            assert!(!signature.is_empty(), "Signature shouldn't be empty");
 
             Ok(())
         }

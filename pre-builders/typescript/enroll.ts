@@ -1,14 +1,17 @@
-import { Connection, Keypair } from "@solana/web3.js";
+import { Keypair } from "@solana/web3.js";
 import { Program, Wallet, AnchorProvider } from "@coral-xyz/anchor";
 import { IDL, Turbin3Prereq } from "./programs/Turbin3_prereq";
 import wallet from "../dev-wallet.json";
 import { executeWithFallback } from "./utils/rpc";
 
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
-const github = Buffer.from("GarrisonPJ", "utf8");
 
 (async () => {
   try {
+    if (!process.env.GITHUB_HANDLE)
+      throw new Error("Missing GITHUB_HANDLE in .env");
+    const github = Buffer.from(process.env.GITHUB_HANDLE, "utf8");
+
     await executeWithFallback(async (connection) => {
       const provider = new AnchorProvider(connection, new Wallet(keypair), {
         commitment: "confirmed",
@@ -31,6 +34,16 @@ const github = Buffer.from("GarrisonPJ", "utf8");
       console.log(`https://explorer.solana.com/tx/${txhash}?cluster=devnet`);
     });
   } catch (e) {
-    console.error("Enroll encountered errors and thus aborted");
+    const errorMsg = e instanceof Error ? e.message : String(e);
+    //exclude the case that wallet is already enrolled
+    if (
+      errorMsg.includes("already in use") ||
+      errorMsg.includes("custom program error: 0x0")
+    ) {
+      //Anchor sometimes reports 'already in use ' as 'custom error 0x0'
+      console.log("You have already enrolled");
+    } else {
+      console.error("Enroll encounterd error and thus aborted:", e);
+    }
   }
 })();

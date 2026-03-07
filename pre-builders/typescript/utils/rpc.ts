@@ -11,6 +11,8 @@ export function getRpcEndPoints(): string[] {
     endpoints.push(process.env.SOLANA_RPC_FALLBACK_1);
   if (process.env.SOLANA_RPC_FALLBACK_2)
     endpoints.push(process.env.SOLANA_RPC_FALLBACK_2);
+  if (process.env.SOLANA_RPC_FALLBACK_3)
+    endpoints.push(process.env.SOLANA_RPC_FALLBACK_3);
 
   //In case the env file is unconfigured
   if (endpoints.length === 0) endpoints.push("https://api.devnet.solana.com");
@@ -31,11 +33,6 @@ function isRetriableError(error: any): boolean {
     "invalid account data",
     "invalid program argument",
     "insufficient balance",
-    "429",
-    "fetch failed",
-    "timeout",
-    "Internal error",
-    "blockhash not found",
   ];
 
   for (const keyword of fatalKeywords) {

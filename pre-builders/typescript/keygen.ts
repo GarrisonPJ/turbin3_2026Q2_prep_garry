@@ -17,7 +17,8 @@ function loadOrGenWallet() {
 
     //log the keypair & the secret key
     console.log(`your new wallet is : ${keyPair.publicKey.toBase58()}`);
-    console.log(`[${keyPair.secretKey}]`);
+    //canceled  the unprofessioncal Private key print
+    //console.log(`[${keyPair.secretKey}]`);
 
     // save the wallet
     writeFileSync(WALLET, JSON.stringify(Array.from(keyPair.secretKey)));

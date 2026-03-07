@@ -11,10 +11,13 @@ import { executeWithFallback } from "./utils/rpc";
 
 // Import our dev wallet keypair from the wallet file
 const from = Keypair.fromSecretKey(new Uint8Array(wallet));
-const to = new PublicKey("HaZRyLZzRknszTHqHn4Kj1iu9uGr6Wiss3jPRDiVPQqz"); // another wallet of mine
 
 (async () => {
   try {
+    if (!process.env.TRANSFER_TARGET_ADDRESS)
+      throw new Error("Missing TRANSFER_TARGET_ADDRESS in .env");
+    const to = new PublicKey(process.env.TRANSFER_TARGET_ADDRESS);
+
     await executeWithFallback(async (connection) => {
       // Get balance of dev wallet
       const balance = await connection.getBalance(from.publicKey);
@@ -48,10 +51,14 @@ const to = new PublicKey("HaZRyLZzRknszTHqHn4Kj1iu9uGr6Wiss3jPRDiVPQqz"); // ano
         (await connection.getFeeForMessage(messageV0, "confirmed")).value || 0;
 
       // Immutable approach: Overwrite the dummy instruction with the exact lamports (balance - fee)
-      const amount = balance - fee;
+      //Get Rent Exemption on chain dynamically
+      const rentExemption =
+        await connection.getMinimumBalanceForRentExemption(0);
+
+      const amount = balance - fee - rentExemption; // preserve estimated fee and RentExemption fro wallet
       if (amount <= 0) {
         throw new Error(
-          `Insufficient balance after fee. balance=${balance}, fee=${fee}`,
+          `Insufficient balance after fee and rent exemption. balance=${balance}, fee=${fee}`,
         );
       }
       instructions[2] = SystemProgram.transfer({
@@ -88,6 +95,6 @@ const to = new PublicKey("HaZRyLZzRknszTHqHn4Kj1iu9uGr6Wiss3jPRDiVPQqz"); // ano
       console.log(`https://explorer.solana.com/tx/${txid}?cluster=devnet`);
     });
   } catch (e) {
-    console.error("Transfer Failed:", e);
+    console.error("Transfer encountered errors and thus aborted:", e);
   }
 })();

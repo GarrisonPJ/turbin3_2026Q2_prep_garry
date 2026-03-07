@@ -28,7 +28,7 @@ pre-builders/
 ### 1. Configuration
 1. Clone this directory.
 2. Copy `.env.example` to `.env`.
-3. Fill in your preferred Solana Devnet RPC URLs in the `.env` file (the system supports up to 2 fallback nodes).
+3. Fill in your preferred Solana Devnet RPC URLs in the `.env` file (the system supports up to 3 fallback nodes).
 
 ### 2. The TypeScript Track
 Navigate to the `typescript` directory and install dependencies:
@@ -58,7 +58,7 @@ Navigate to the `rust` directory:
 cd ../rust
 ```
 
-The Rust environment automatically traverses the directory tree to locate the shared `.env` and `dev-wallet.json`.
+The Rust environment automatically traverses the directory tree and reads the WALLET_PATH vatiable to locate the Keypair.
 
 Execute the enrollment integration test:
 ```bash
