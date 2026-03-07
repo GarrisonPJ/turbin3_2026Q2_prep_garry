@@ -58,7 +58,7 @@ Navigate to the `rust` directory:
 cd ../rust
 ```
 
-The Rust environment automatically traverses the directory tree and reads the WALLET_PATH vatiable to locate the Keypair.
+The Rust environment automatically traverses the directory tree and reads the WALLET_PATH variable to locate the Keypair.
 
 Execute the enrollment integration test:
 ```bash

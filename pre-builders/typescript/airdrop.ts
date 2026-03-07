@@ -35,6 +35,6 @@ const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
       console.log(`https://explorer.solana.com/tx/${txhash}?cluster=devnet`); // keep the url complete from the possible line wrapping
     });
   } catch (e) {
-    console.error("Airdrop encountered errors and thus aborted");
+    console.error("Airdrop encountered errors and thus aborted:", e);
   }
 })();
