@@ -32,3 +32,6 @@ Implemented deep error downcasting in Rust `tests/integration.rs`, unwrapping `C
 
 2026/3/7
 Conducted comprehensive code review remediation. Fixed RPC retry semantics by correctly classifying transient network failures. Secured key generation by removing plaintext secret key logging. Extracted hardcoded variables (GitHub handle, transfer target) into `.env`. Engineered rent-exemption preservation logic in `transfer.ts` to prevent account purging. Added idempotent error handling in TS. Strengthened Rust architecture by injecting `WALLET_PATH` to eliminate fragile dependencies, and introduced TDD unit tests for `Config` loading and Anchor instruction discriminator encoding. Applied workspace-wide linting and formatting.
+
+2026/3/8
+Finished review and other improvements. Upgraded error classification from fragile string-matching to strict native typing (SendTransactionError). Eliminated keygen console vulnerability by securely parsing and outputting only the public key. Unified telemetry across both languages with standard log levels ([INFO], [WARN], [ERROR]) and actionable prompts. Rewrote Rust integration tests to natively parse `0x0` idempotency states into graceful closures, reinforced by >64 byte Base58 signature assertions. Injected a lightweight native `tests.ts` baseline bound to `npm run test` and aligned README deployment specifications.

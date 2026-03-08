@@ -68,20 +68,20 @@ impl SolanaOps {
         let blockhash = self
             .client
             .get_latest_blockhash()
-            .context("Failed to get blockhash")?;
+            .context("[ERROR] Failed to get blockhash")?;
 
         //construct V0Message
         let message =
             v0::Message::try_compile(&self.signer.pubkey(), &[instruction], &[], blockhash)
-                .context("Failed to compile v0 message")?;
+                .context("[ERROR] Failed to compile v0 message")?;
 
         let tx = VersionedTransaction::try_new(VersionedMessage::V0(message), &[&self.signer])
-            .context("Failed to sign transaction")?;
+            .context("[ERROR] Failed to sign transaction")?;
 
         let signature = self
             .client
             .send_and_confirm_transaction(&tx)
-            .context("Failed to send transaction")?;
+            .context("[ERROR] Failed to send transaction")?;
 
         Ok(signature.to_string())
     }

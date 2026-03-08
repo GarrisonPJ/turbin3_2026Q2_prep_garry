@@ -1,4 +1,4 @@
-import { Keypair } from "@solana/web3.js";
+import { Keypair, SendTransactionError } from "@solana/web3.js";
 import { Program, Wallet, AnchorProvider } from "@coral-xyz/anchor";
 import { IDL, Turbin3Prereq } from "./programs/Turbin3_prereq";
 import wallet from "../dev-wallet.json";
@@ -30,20 +30,25 @@ const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
         })
         .rpc(); // Removed signer function, Anchor will handle it since we passed keypair to provider before.
 
-      console.log("Success! Check out TX here:");
+      console.log("[INFO] Success! Check out TX here:");
       console.log(`https://explorer.solana.com/tx/${txhash}?cluster=devnet`);
     });
   } catch (e) {
-    const errorMsg = e instanceof Error ? e.message : String(e);
-    //exclude the case that wallet is already enrolled
-    if (
-      errorMsg.includes("already in use") ||
-      errorMsg.includes("custom program error: 0x0")
-    ) {
-      //Anchor sometimes reports 'already in use ' as 'custom error 0x0'
-      console.log("You have already enrolled");
-    } else {
-      console.error("Enroll encounterd error and thus aborted:", e);
+    if (e instanceof SendTransactionError) {
+      const logs = e.logs?.join(" ") || "";
+      // SystemProgram Failed to create account , often shown as  0x0
+      if (
+        logs.includes("already in use") ||
+        logs.includes("custom program error: 0x0")
+      ) {
+        console.log("[INFO] You have already enrolled.");
+        return; // return early,NOT as an error
+      }
     }
+
+    console.error(
+      "[ERROR] Enroll encountered fatal errors and aborted. Please check your RPC and balance.",
+      e,
+    );
   }
 })();

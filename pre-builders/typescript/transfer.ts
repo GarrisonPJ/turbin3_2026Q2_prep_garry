@@ -21,10 +21,7 @@ const from = Keypair.fromSecretKey(new Uint8Array(wallet));
     await executeWithFallback(async (connection) => {
       // Get balance of dev wallet
       const balance = await connection.getBalance(from.publicKey);
-      if (balance === 0)
-        throw new Error(
-          "Balance is 0. Please get SOL from faucet.solana.com first!",
-        );
+      if (balance === 0) throw new Error("Balance is 0. Please get SOL first!");
 
       // Rewrote in Agave 3.0 Practice: Add Priority Fees (Compute Budget) to ensure the transaction lands
       const instructions = [
@@ -91,10 +88,10 @@ const from = Keypair.fromSecretKey(new Uint8Array(wallet));
         "confirmed",
       );
 
-      console.log("Success! Check out your TX here:");
+      console.log("[INFO] Success! Check out your TX here:");
       console.log(`https://explorer.solana.com/tx/${txid}?cluster=devnet`);
     });
   } catch (e) {
-    console.error("Transfer encountered errors and thus aborted:", e);
+    console.error("[ERROR] Transfer encountered fatal errors and aborted:", e);
   }
 })();

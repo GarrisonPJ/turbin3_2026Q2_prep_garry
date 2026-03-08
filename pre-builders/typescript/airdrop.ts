@@ -11,7 +11,7 @@ const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
 (async () => {
   try {
     await executeWithFallback(async (connection) => {
-      console.log(`Airdrop address: ${keypair.publicKey.toBase58()}`);
+      console.log(`[INFO] Airdrop address: ${keypair.publicKey.toBase58()}`);
 
       // claim 1 devnet SOL tokens to decrease the possibility of rate-limitting
       const txhash = await connection.requestAirdrop(
@@ -31,10 +31,11 @@ const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
 
       await connection.confirmTransaction(strategy, "confirmed"); // passing strategy here instead, old method deprecated
 
-      console.log("Success! Check out your TX here:");
+      console.log("[INFO] Success! Check out your TX here:");
       console.log(`https://explorer.solana.com/tx/${txhash}?cluster=devnet`); // keep the url complete from the possible line wrapping
     });
   } catch (e) {
-    console.error("Airdrop encountered errors and thus aborted:", e);
+    console.error("[ERROR] Airdrop encountered fatal errors and aborted:", e);
+    console.log("[INFO] Please check your .env configuration.");
   }
 })();

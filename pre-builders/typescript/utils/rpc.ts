@@ -1,8 +1,8 @@
-import { Connection } from "@solana/web3.js";
+import { Connection, SendTransactionError } from "@solana/web3.js";
 import * as dotenv from "dotenv";
 import * as path from "path";
 
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 //Get all the RPC nodes configured
 export function getRpcEndPoints(): string[] {
   const endpoints: string[] = [];
@@ -21,9 +21,14 @@ export function getRpcEndPoints(): string[] {
 }
 
 //Check if it is retriable
-function isRetriableError(error: any): boolean {
+export function isRetriableError(error: any): boolean {
+  if (error instanceof SendTransactionError) {
+    return false;
+  }
+  if (error instanceof TypeError) {
+    return true;
+  }
   const errorMsg = error instanceof Error ? error.message : String(error);
-
   //Define Errors not worth retrying
   const fatalKeywords = [
     "Simulation failed",
@@ -41,7 +46,7 @@ function isRetriableError(error: any): boolean {
     }
   }
 
-  return true; //take it as network issue
+  return true; //take it as default network issue
 }
 
 //Core injection. Automatically inject Connection and handle error retries.
@@ -61,26 +66,24 @@ export async function executeWithFallback<T>(
       } catch (error) {
         if (!isRetriableError(error)) {
           console.error(
-            `[Fatal Error] Transaction encountered error and thus aborted`,
+            `[ERROR] Transaction encountered error and aborted: ${error}`,
           );
           throw error;
         }
 
         const msg = error instanceof Error ? error.message : String(error);
         console.warn(
-          `[RPC Warning] Node ${endpoint} Failed ${attempt} time:${msg.substring(0, 100)}... `,
+          `[WARN] RPC endpoint ${endpoint} Failed ${attempt} time:${msg.substring(0, 100)}... `,
           error instanceof Error ? error.message : error,
         );
 
         if (attempt === maxRetriesPerEndpoint) break;
 
-        console.log("Retrying in 1 second...");
+        console.log("[INFO] Retrying in 1 second...");
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
   }
 
-  throw new Error(
-    "[RPC Error] all RPC nodes are paralyzed, transaction aborted",
-  );
+  throw new Error("[ERROR] All RPC endpoints exhausted, transaction aborted");
 }
