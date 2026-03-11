@@ -35,3 +35,6 @@ Conducted comprehensive code review remediation. Fixed RPC retry semantics by co
 
 2026/3/8
 Finished review and other improvements. Upgraded error classification from fragile string-matching to strict native typing (SendTransactionError). Eliminated keygen console vulnerability by securely parsing and outputting only the public key. Unified telemetry across both languages with standard log levels ([INFO], [WARN], [ERROR]) and actionable prompts. Rewrote Rust integration tests to natively parse `0x0` idempotency states into graceful closures, reinforced by >64 byte Base58 signature assertions. Injected a lightweight native `tests.ts` baseline bound to `npm run test` and aligned README deployment specifications.
+
+2026/3/11
+ Haven't done a thing in the past 2days due to my PC is broken,took some time to set a new one and other stuffs. Anyway,finished `spl_init.ts` to initialize a new SPL Token Mint on Devnet, applying `.env` dependency injection for Helius RPC nodes. Completed `spl_mint.ts` by implementing the Associated Token Account (ATA) derivation pattern. Successfully minted 100 tokens to a local ATA using `getOrCreateAssociatedTokenAccount` and `mintTo`, handling 6-decimal precision with native BigInt math. 
