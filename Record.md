@@ -41,3 +41,6 @@ Finished review and other improvements. Upgraded error classification from fragi
 
  2026/3/12
  Implemented `spl_transfer.ts` to perform cross-wallet token transfers. Grepd the indirection between System Wallet Addresses and Associated Token Accounts (ATA), utilizing `getOrCreateAssociatedTokenAccount` to ensure recipient liquidity and executing the transfer with 6-decimal BigInt precision. Verified the transaction on Solana Explorer. 
+
+2026/3/15
+Completed `spl_metadata.ts` migration to Umi/Metaplex flow. Implemented `createV1` metadata creation for fungible token use-case, added mint-authority preflight validation via on-chain mint fetch (`getMint`), and enforced creator share invariants for multi-creator extension safety. Replaced env-based Base58 secret dependency with local `turbin3-wallet.json` key material (`Uint8Array`) to match existing cluster scripts; kept `bs58` only for transaction signature encoding required by Solana Explorer URL output. Hardcoded temporary `tokenSymbol`/`tokenUri` placeholders for iterative testing.
