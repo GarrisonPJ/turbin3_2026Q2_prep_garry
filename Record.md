@@ -44,3 +44,6 @@ Finished review and other improvements. Upgraded error classification from fragi
 
 2026/3/15
 Completed `spl_metadata.ts` migration to Umi/Metaplex flow. Implemented `createV1` metadata creation for fungible token use-case, added mint-authority preflight validation via on-chain mint fetch (`getMint`), and enforced creator share invariants for multi-creator extension safety. Replaced env-based Base58 secret dependency with local `turbin3-wallet.json` key material (`Uint8Array`) to match existing cluster scripts; kept `bs58` only for transaction signature encoding required by Solana Explorer URL output. Hardcoded temporary `tokenSymbol`/`tokenUri` placeholders for iterative testing.
+
+2026/3/16
+Completed `nft_image.ts` under Umi + Irys workflow. Implemented local image loading, MIME inference from extension, `createGenericFile` conversion, and `umi.uploader.upload` flow to output image URI for downstream metadata minting. Fixed functional API misuse (`umi.uploader` callable error) and corrected runtime path resolution (`ENOENT`) by aligning file path with script execution root. Current blocker confirmed as external environment/infrastructure instability rather than business logic: local proxy introduced HTTP/HTTPS mismatch, and after isolation the Irys devnet endpoint returned transient `503` service availability failures.
