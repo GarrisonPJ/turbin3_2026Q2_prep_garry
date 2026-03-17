@@ -47,3 +47,6 @@ Completed `spl_metadata.ts` migration to Umi/Metaplex flow. Implemented `createV
 
 2026/3/16
 Completed `nft_image.ts` under Umi + Irys workflow. Implemented local image loading, MIME inference from extension, `createGenericFile` conversion, and `umi.uploader.upload` flow to output image URI for downstream metadata minting. Fixed functional API misuse (`umi.uploader` callable error) and corrected runtime path resolution (`ENOENT`) by aligning file path with script execution root. Current blocker confirmed as external environment/infrastructure instability rather than business logic: local proxy introduced HTTP/HTTPS mismatch, and after isolation the Irys devnet endpoint returned transient `503` service availability failures.
+
+2026/3/17
+Completed `nft_metadata.ts` end-to-end using the image URI generated from `nft_image.ts`. Standardized environment key usage around `NFT_IMAGE_URI`, Resolved repeated runtime connectivity issues by executing upload commands with proxy variables unset for the session, then successfully produced metadata URI for downstream `nft_mint.ts` consumption.
