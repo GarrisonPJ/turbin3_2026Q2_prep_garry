@@ -50,3 +50,6 @@ Completed `nft_image.ts` under Umi + Irys workflow. Implemented local image load
 
 2026/3/17
 Completed `nft_metadata.ts` end-to-end using the image URI generated from `nft_image.ts`. Standardized environment key usage around `NFT_IMAGE_URI`, Resolved repeated runtime connectivity issues by executing upload commands with proxy variables unset for the session, then successfully produced metadata URI for downstream `nft_mint.ts` consumption.
+
+2026/3/18
+Completed `vault_init.ts`. Resolved `Program` initialization incompatibilities caused by legacy generated IDL shape (`address/types/accounts/instructions` expectations in `@coral-xyz/anchor@0.31.x`) by adding a lightweight runtime normalization layer for the local IDL (legacy `publicKey` type mapping, account/instruction discriminator injection, and account name normalization). Verified PDA derivation flow (`vaultState` -> `vaultAuth` -> `vault`).
