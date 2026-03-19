@@ -53,3 +53,6 @@ Completed `nft_metadata.ts` end-to-end using the image URI generated from `nft_i
 
 2026/3/18
 Completed `vault_init.ts`. Resolved `Program` initialization incompatibilities caused by legacy generated IDL shape (`address/types/accounts/instructions` expectations in `@coral-xyz/anchor@0.31.x`) by adding a lightweight runtime normalization layer for the local IDL (legacy `publicKey` type mapping, account/instruction discriminator injection, and account name normalization). Verified PDA derivation flow (`vaultState` -> `vaultAuth` -> `vault`).
+
+2026/3/19
+Completed `vault_deposit.ts` with the same Anchor 0.31 compatibility strategy used in `vault_init.ts` (legacy IDL normalization, signer/writable mapping, and discriminator injection). Reused recorded `vaultState` to deterministically derive `vaultAuth` and `vault`, then executed `deposit` using lamports-denominated `BN` input. Verified deposit correctness by comparing owner/vault balances before and after transaction confirmation under the stabilized Node runtime proxy configuration.
