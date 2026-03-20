@@ -56,3 +56,6 @@ Completed `vault_init.ts`. Resolved `Program` initialization incompatibilities c
 
 2026/3/19
 Completed `vault_deposit.ts` with the same Anchor 0.31 compatibility strategy used in `vault_init.ts` (legacy IDL normalization, signer/writable mapping, and discriminator injection). Reused recorded `vaultState` to deterministically derive `vaultAuth` and `vault`, then executed `deposit` using lamports-denominated `BN` input. Verified deposit correctness by comparing owner/vault balances before and after transaction confirmation under the stabilized Node runtime proxy configuration.
+
+2026/3/19
+Completed `vault_withdraw.ts` by reusing the same Anchor 0.31 legacy-IDL compatibility layer and deterministic PDA derivation flow (`vaultState` -> `vaultAuth` -> `vault`) from deposit/init scripts. Validated compile/runtime wiring and account mapping, then diagnosed withdrawal failure (`custom program error: 0x1`) as expected state-level insufficiency (`vault` lamports = 0 while attempting 10_000_000 lamports transfer). 
