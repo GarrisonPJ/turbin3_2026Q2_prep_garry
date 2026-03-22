@@ -62,3 +62,6 @@ Completed `vault_withdraw.ts` by reusing the same Anchor 0.31 legacy-IDL compati
 
 2026/3/21
 Completed `vault_close.ts` and resolved `InstructionFallbackNotFound (101)` by aligning instruction discriminator derivation with snake_case normalization for camelCase IDL names (`closeAccount` -> `close_account`) under the existing Anchor 0.31 legacy-IDL compatibility layer.
+
+2026/3/22
+Completed `vault_deposit_spl.ts` to a runnable structure under the same Anchor 0.31 legacy-IDL compatibility approach.
