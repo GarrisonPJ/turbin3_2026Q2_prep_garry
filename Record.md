@@ -65,3 +65,6 @@ Completed `vault_close.ts` and resolved `InstructionFallbackNotFound (101)` by a
 
 2026/3/22
 Completed `vault_deposit_spl.ts` to a runnable structure under the same Anchor 0.31 legacy-IDL compatibility approach.
+
+2026/3/23
+Completed `vault_withdraw_spl.ts`. Verified that current failure mode `AccountNotInitialized (3012)` on `vault_state` is a state-precondition issue (closed or uninitialized vault state) rather than a client instruction/account-mapping bug. 
