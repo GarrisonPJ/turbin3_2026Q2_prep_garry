@@ -15,7 +15,7 @@ import {
 } from "@coral-xyz/anchor";
 import { IDL } from "./programs/wba_vault";
 import wallet from "../turbin3-wallet.json";
-import {createHash} from "crypto";
+import { createHash } from "crypto";
 import {
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -32,7 +32,7 @@ function requiredEnv(name: string): string {
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
 
 // Commitment
-const commitment: Commitment = "finalized";
+const commitment: Commitment = "confirmed";
 
 // Create a devnet connection
 const rpcUrl = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
@@ -146,7 +146,14 @@ const amount = new BN(humanAmount * 10 ** tokenDecimals);
       // ]).rpc();
       // console.log(`Withdraw success! Check out your TX here:\n\nhttps://explorer.solana.com/tx/${signature}?cluster=devnet`);
       
-       // owner ATA
+    const stateInfo = await connection.getAccountInfo(vaultState, commitment);
+    if (!stateInfo) {
+      throw new Error(
+        `[ERROR] vaultState is not initialized/found: ${vaultState.toBase58()}. Re-run vault_init and update WBA_VAULT_STATE.`,
+      );
+    }
+
+    // owner ATA
       const ownerAta = await getOrCreateAssociatedTokenAccount(
         connection,
         keypair,
@@ -178,7 +185,21 @@ const amount = new BN(humanAmount * 10 ** tokenDecimals);
         })
         .rpc();
 
+    const [ownerAfter, vaultAfter] = await Promise.all([
+      connection.getTokenAccountBalance(ownerAta.address, commitment),
+      connection.getTokenAccountBalance(vaultAta.address, commitment),
+    ]);
+
     console.log("[INFO] Withdraw SPL success");
+    console.log("[INFO] owner:", keypair.publicKey.toBase58());
+    console.log("[INFO] vaultState:", vaultState.toBase58());
+    console.log("[INFO] vaultAuth:", vaultAuth.toBase58());
+    console.log("[INFO] tokenMint:", tokenMint.toBase58());
+    console.log("[INFO] ownerAta:", ownerAta.address.toBase58());
+    console.log("[INFO] vaultAta:", vaultAta.address.toBase58());
+    console.log("[INFO] withdraw amount(base units):", amount.toString());
+    console.log("[INFO] ownerAta after:", ownerAfter.value.amount);
+    console.log("[INFO] vaultAta after:", vaultAfter.value.amount);
     console.log(
       `[INFO] https://explorer.solana.com/tx/${signature}?cluster=devnet`,
     );
