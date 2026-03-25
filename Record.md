@@ -69,5 +69,8 @@ Completed `vault_deposit_spl.ts` to a runnable structure under the same Anchor 0
 2026/3/23
 Completed `vault_withdraw_spl.ts`. Verified that current failure mode `AccountNotInitialized (3012)` on `vault_state` is a state-precondition issue (closed or uninitialized vault state) rather than a client instruction/account-mapping bug. 
 
-2026/3/23
+2026/3/24
 Completed `vault_withdraw_spl.ts`. Added explicit preflight guard for `WBA_VAULT_STATE` initialization/existence to fail early with actionable guidance.
+
+2026/3/25
+Completed `vault_deposit_nft.ts` . Wired full `depositNft` account mapping including owner/vault ATAs and Metaplex metadata PDAs (`nftMetadata`, `nftMasterEdition`, `metadataProgram`).
