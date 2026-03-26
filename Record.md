@@ -74,3 +74,6 @@ Completed `vault_withdraw_spl.ts`. Added explicit preflight guard for `WBA_VAULT
 
 2026/3/25
 Completed `vault_deposit_nft.ts` . Wired full `depositNft` account mapping including owner/vault ATAs and Metaplex metadata PDAs (`nftMetadata`, `nftMasterEdition`, `metadataProgram`).
+
+2026/3/26
+Completed `vault_withdraw_nft.ts`. It now fails fast on missing NFT mint env (`NFT_MINT_ADDRESS` / `WBA_NFT_MINT_ADDRESS`), indicating business-config precondition rather than toolchain failure.
