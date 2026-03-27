@@ -13,8 +13,8 @@ import {
   Address,
   BN,
 } from "@coral-xyz/anchor";
-import { createHash } from "crypto";
 import { IDL } from "./programs/wba_vault";
+import { buildIdlCompat } from "./utils/anchor_idl_compat";
 import wallet from "../turbin3-wallet.json";
 import {
   TOKEN_PROGRAM_ID,
@@ -40,75 +40,7 @@ const programId = requiredEnv("WBA_VAULT_PROGRAM_ID") as Address;
 const vaultState = new PublicKey(requiredEnv("WBA_VAULT_STATE"));
 const tokenMint = new PublicKey(requiredEnv("WBA_MINT_ADDRESS"));
 
-const normalizeLegacyIdlType = (value: any): any => {
-  if (value === "publicKey") return "pubkey";
-  if (Array.isArray(value)) return value.map(normalizeLegacyIdlType);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(
-      Object.entries(value).map(([k, v]) => [k, normalizeLegacyIdlType(v)]),
-    );
-  }
-  return value;
-};
-
-const accountDiscriminator = (name: string): number[] =>
-  Array.from(
-    createHash("sha256").update(`account:${name}`).digest().subarray(0, 8),
-  );
-
-const instructionDiscriminator = (name: string): number[] =>
-  Array.from(
-    createHash("sha256")
-      .update(
-        `global:${name.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase()}`,
-      )
-      .digest()
-      .subarray(0, 8),
-  );
-
-const normalizeInstructionAccountMeta = (account: any) => {
-  const a = normalizeLegacyIdlType(account);
-  return {
-    ...a,
-    signer: typeof a.signer === "boolean" ? a.signer : !!a.isSigner,
-    writable: typeof a.writable === "boolean" ? a.writable : !!a.isMut,
-  };
-};
-
-const normalizedAccounts = ((IDL as any).accounts ?? []).map((acc: any) => {
-  const a = normalizeLegacyIdlType(acc);
-  const name = typeof a.name === "string" ? a.name.toLowerCase() : a.name;
-  return {
-    ...a,
-    name,
-    discriminator: accountDiscriminator(name),
-  };
-});
-
-const normalizedTypes = normalizedAccounts.map((acc: any) => ({
-  name: acc.name,
-  type: acc.type,
-}));
-
-const normalizedInstructions = ((IDL as any).instructions ?? []).map(
-  (ix: any) => {
-    const i = normalizeLegacyIdlType(ix);
-    return {
-      ...i,
-      accounts: (i.accounts ?? []).map(normalizeInstructionAccountMeta),
-      discriminator: instructionDiscriminator(ix.name),
-    };
-  },
-);
-
-const idlCompat = {
-  ...IDL,
-  address: programId,
-  accounts: normalizedAccounts,
-  types: normalizedTypes,
-  instructions: normalizedInstructions,
-};
-
+const idlCompat = buildIdlCompat(IDL as any, programId);
 const program = new Program(idlCompat as any, provider);
 
 const [vaultAuth] = PublicKey.findProgramAddressSync(
