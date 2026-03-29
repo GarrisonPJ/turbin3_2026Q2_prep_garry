@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
+import { requiredEnv, requiredOneOfEnv } from "./utils/env";
 import {
   Connection,
   Keypair,
@@ -15,12 +17,6 @@ import {
   TOKEN_PROGRAM_ID,
   getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
-
-function requiredEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`[ERROR] Missing env: ${name}`);
-  return v;
-}
 
 // Import our keypair from the wallet file
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
@@ -40,10 +36,7 @@ const provider = new AnchorProvider(connection, new Wallet(keypair), {
 // Create our program
 const programId = requiredEnv("WBA_VAULT_PROGRAM_ID") as Address;
 const vaultState = new PublicKey(requiredEnv("WBA_VAULT_STATE"));
-const nftMintEnv = process.env.NFT_MINT_ADDRESS ?? process.env.WBA_NFT_MINT_ADDRESS;
-if (!nftMintEnv) {
-  throw new Error("[ERROR] Missing env: NFT_MINT_ADDRESS (or WBA_NFT_MINT_ADDRESS)");
-}
+const nftMintEnv = requiredOneOfEnv(["NFT_MINT_ADDRESS", "WBA_NFT_MINT_ADDRESS"]);
 const tokenMint = new PublicKey(nftMintEnv);
 
 const idlCompat = buildIdlCompat(IDL as any, programId);
@@ -115,7 +108,7 @@ const nftMasterEdition = PublicKey.findProgramAddressSync(
     console.log(
       `[INFO] TX: https://explorer.solana.com/tx/${signature}?cluster=devnet`,
     );
-  } catch (e) {
-    console.error("[ERROR] vault_withdraw_nft failed and aborted:", e);
+  } catch (error) {
+    await logTxError("vault_withdraw_nft failed", error);
   }
 })();

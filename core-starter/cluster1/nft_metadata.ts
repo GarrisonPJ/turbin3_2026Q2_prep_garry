@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
 import wallet from "../turbin3-wallet.json";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import {
@@ -8,15 +9,9 @@ import {
 } from "@metaplex-foundation/umi";
 import { irysUploader } from "@metaplex-foundation/umi-uploader-irys";
 
-function requiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`[ERROR] Missing env: ${name}`);
-  return value;
-}
-
 // Create a devnet connection
 const rpcUrl = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-const imageUri = process.env.NFT_IMAGE_URI ?? "TODO_IMAGE_URI"; //Hardcode ruslt of nft_image url for now
+const imageUri = process.env.NFT_IMAGE_URI ?? "TODO_IMAGE_URI";
 const nftName = process.env.NFT_NAME ?? "TODO_NAME";
 const nftSymbol = process.env.NFT_SYMBOL ?? "TODO_SYMBOL";
 const nftDescription =
@@ -74,6 +69,6 @@ umi.use(signerIdentity(signer));
     console.log("[INFO] Meatadata uploaded successfully. Check:");
     console.log(metadataUri);
   } catch (error) {
-    console.log("[ERROR] nft_metadata failed and aborted:", error);
+    await logTxError("nft_metadata failed", error);
   }
 })();

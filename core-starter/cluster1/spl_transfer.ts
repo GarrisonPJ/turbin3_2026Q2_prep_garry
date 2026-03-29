@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
 import {
   Commitment,
   Connection,
@@ -56,7 +57,7 @@ const to = new PublicKey("HaZRyLZzRknszTHqHn4Kj1iu9uGr6Wiss3jPRDiVPQqz"); //Just
 
     console.log("[INFO] Success! Check your transaction:");
     console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`);
-  } catch (e) {
-    console.error(`[ERROR] Transfer went wrong and aborted: ${e}`);
+  } catch (error) {
+    await logTxError("spl_transfer failed", error);
   }
 })();

@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
 import { Keypair, Connection, Commitment } from "@solana/web3.js";
 import { createMint } from "@solana/spl-token";
 import wallet from "../turbin3-wallet.json";
@@ -15,8 +16,6 @@ const connection = new Connection(
 
 (async () => {
   try {
-    // Start here
-    // const mint = ???
     const mint = await createMint(
       connection,
       keypair,
@@ -29,6 +28,6 @@ const connection = new Connection(
       `[INFO] Success! Your new token mint address is ${mint.toBase58()}`,
     );
   } catch (error) {
-    console.log(`[ERROR] Mint went wrong and aborted: ${error}`);
+    await logTxError("spl_init failed", error);
   }
 })();

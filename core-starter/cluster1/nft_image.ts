@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
 import path from "path";
 import wallet from "../turbin3-wallet.json";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -22,7 +23,7 @@ function guessContentType(fileName: string): string {
 // Create a devnet connection
 const rpcUrl = process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
 const umi = createUmi(rpcUrl);
-const imagePath = "./cluster1/coin.png"; // Hardcoded for now
+const imagePath = process.env.NFT_IMAGE_PATH ?? "./cluster1/coin.png";
 let keypair = umi.eddsa.createKeypairFromSecretKey(new Uint8Array(wallet));
 const signer = createSignerFromKeypair(umi, keypair);
 
@@ -31,21 +32,15 @@ umi.use(signerIdentity(signer));
 
 (async () => {
   try {
-    //1. Load image
-    //2. Convert image to generic file.
-    //3. Upload image
-    // const image = ???
     const imageBuffer = await readFile(imagePath);
     const fileName = path.basename(imagePath);
     const contentType = guessContentType(fileName);
     const imageFile = createGenericFile(imageBuffer, fileName, { contentType });
-    // const [myUri] = ???
-    // console.log("Your image URI: ", myUri);
     const [imageUri] = await umi.uploader.upload([imageFile]);
 
     console.log("[INFO] Image uploaded:");
     console.log(imageUri);
   } catch (error) {
-    console.log("[ERROR] nft_image went wrong and aborted", error);
+    await logTxError("nft_image failed", error);
   }
 })();

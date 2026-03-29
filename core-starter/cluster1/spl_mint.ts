@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
 import { Keypair, PublicKey, Connection, Commitment } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 import wallet from "../turbin3-wallet.json";
@@ -24,7 +25,6 @@ const mint = new PublicKey(process.env.WBA_MINT_ADDRESS);
 (async () => {
   try {
     // Create an ATA
-    // const ata = ???
     // console.log(`Your ata is: ${ata.address.toBase58()}`);
     const ata = await getOrCreateAssociatedTokenAccount(
       connection,
@@ -34,7 +34,6 @@ const mint = new PublicKey(process.env.WBA_MINT_ADDRESS);
     );
     console.log(`[INFO] Your ATA address is:${ata.address.toBase58()}`);
     // Mint to ATA
-    // const mintTx = ???
     // console.log(`Your mint txid: ${mintTx}`);
     const mintTx = await mintTo(
       connection,
@@ -48,6 +47,6 @@ const mint = new PublicKey(process.env.WBA_MINT_ADDRESS);
     console.log("[INFO] Check it out: ");
     console.log(`https://explorer.solana.com/tx/${mintTx}?cluster=devnet`);
   } catch (error) {
-    console.log(`[ERROR] Mint went wrong and aborted: ${error}`);
+    await logTxError("spl_mint failed", error);
   }
 })();

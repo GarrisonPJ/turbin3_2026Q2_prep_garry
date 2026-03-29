@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
 import {
   Connection,
   Keypair,
@@ -73,7 +74,7 @@ console.log(`[INFO] vault: ${vault.toBase58()}`);
 
     console.log("[INFO] Init success! Check:");
     console.log(`https://explorer.solana.com/tx/${signature}?cluster=devnet`);
-  } catch (e) {
-    console.error(`[ERROR] vault_init failed and aborted: ${e}`);
+  } catch (error) {
+    await logTxError("vault_init failed", error);
   }
 })();

@@ -52,14 +52,47 @@ Interacting with a black-box Rust contract (`wba_vault`) purely via its IDL.
    ```
 
 2. **Environment Variables (`.env`)**:
-   Ensure your `.env` contains the following keys. The `VAULT_PROGRAM_ID` is critical for Phase 3.
+   Ensure your `.env` contains the following keys. `WBA_VAULT_PROGRAM_ID` is critical for Phase 3.
    ```env
    SOLANA_RPC_URL="https://api.devnet.solana.com"
-   VAULT_PROGRAM_ID="D51uEDHLbWAxNfodfQDv7qkp8WZtxrhi3uganGbNos7o"
+   WBA_VAULT_PROGRAM_ID="D51uEDHLbWAxNfodfQDv7qkp8WZtxrhi3uganGbNos7o"
+   NFT_IMAGE_PATH="./cluster1/coin.png"
+   NFT_MINT_ADDRESS="<set after nft_mint>"
    ```
 
 3. **Execution**:
-   Run the scripts sequentially using the provided npm commands, for example:
+   Run scripts step-by-step, or use the regression runner:
    ```bash
-   npm run spl_init
+   npm run cluster1_regression
    ```
+
+## Recommended Sequence
+
+```bash
+# SPL
+npm run spl_init
+npm run spl_mint
+npm run spl_transfer
+npm run spl_metadata
+
+# NFT
+npm run nft_image
+npm run nft_metadata
+npm run nft_mint
+
+# Vault (SOL/SPL/NFT)
+npm run vault_init
+npm run vault_deposit
+npm run vault_withdraw
+npm run vault_deposit_spl
+npm run vault_withdraw_spl
+npm run vault_deposit_nft
+npm run vault_withdraw_nft
+npm run vault_close
+```
+
+## Common Errors
+
+- `fetch failed`: RPC/proxy connectivity issue. Use `scripts/run_with_proxy_fallback.sh <script>` to retry with proxy off.
+- `Missing env: ...`: update `.env` (`NFT_MINT_ADDRESS`, `WBA_VAULT_STATE`, etc.) before running dependent scripts.
+- `custom program error: 0x1` / `insufficient funds`: state or balance precondition issue (not usually a client mapping bug).

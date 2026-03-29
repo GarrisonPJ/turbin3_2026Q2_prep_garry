@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
+import { requiredEnv } from "./utils/env";
 import bs58 from "bs58";
 import wallet from "../turbin3-wallet.json";
 import { Connection, PublicKey } from "@solana/web3.js";
@@ -19,12 +21,6 @@ import {
   findMetadataPda,
   type CreatorArgs,
 } from "@metaplex-foundation/mpl-token-metadata";
-
-function requiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`[ERROR] ${name} is missing in .env`);
-  return value;
-}
 
 async function assertMintAuthorityMatches(params: {
   connection: Connection;
@@ -125,7 +121,7 @@ async function main() {
   console.log(`tx: https://explorer.solana.com/tx/${signature}?cluster=devnet`);
 }
 
-main().catch((err) => {
-  console.error("[FATAL]", err);
+main().catch(async (err) => {
+  await logTxError("spl_metadata failed", err);
   process.exit(1);
 });

@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
+import { requiredEnv } from "./utils/env";
 import {
   Connection,
   Keypair,
@@ -16,12 +18,6 @@ import {
 import { IDL } from "./programs/wba_vault";
 import { buildIdlCompat } from "./utils/anchor_idl_compat";
 import wallet from "../turbin3-wallet.json";
-
-function requiredEnv(name: string): string {
-  const v = process.env[name];
-  if (!v) throw new Error(`[ERROR] Missing env: ${name}`);
-  return v;
-}
 
 // Import our keypair from the wallet file
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
@@ -111,7 +107,7 @@ const depositLamports = new BN(10_000_000);
     console.log(
       `[INFO] TX:https://explorer.solana.com/tx/${signature}?cluster=devnet`,
     );
-  } catch (e) {
-    console.error(`[ERROR] vault_deposit failed and aborted:${e}`);
+  } catch (error) {
+    await logTxError("vault_deposit failed", error);
   }
 })();

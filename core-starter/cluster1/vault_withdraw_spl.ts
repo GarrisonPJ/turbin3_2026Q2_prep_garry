@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { logTxError } from "./utils/errors";
+import { requiredEnv } from "./utils/env";
 import {
   Connection,
   Keypair,
@@ -21,12 +23,6 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getOrCreateAssociatedTokenAccount,
 } from "@solana/spl-token";
-
-function requiredEnv(name: string): string {
-   const v = process.env[name];
-   if (!v) throw new Error(`[ERROR] Missing env: ${name}`);
-   return v;
-}
 
 // Import our keypair from the wallet file
 const keypair = Keypair.fromSecretKey(new Uint8Array(wallet));
@@ -132,7 +128,7 @@ const amount = new BN(humanAmount * 10 ** tokenDecimals);
     console.log(
       `[INFO] https://explorer.solana.com/tx/${signature}?cluster=devnet`,
     );
-  } catch (e) {
-    console.error(`[ERROR] vault_withdraw_spl failed and aborted: ${e}`);
+  } catch (error) {
+    await logTxError("vault_withdraw_spl failed", error);
   }
 })();
